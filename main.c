@@ -186,6 +186,7 @@ int inputFile(COLUM_FORM *pcolum_name, SCORE_DATAFORM* pscore)
 		}
 	} while (read_judge == EOF);
 
+
 	/*—ñ–¼‚ÌŽæ“¾*/
 	getColum(fp,&cpy_colum_name); /*‚È‚º‚©&fp‚Å“n‚¹‚È‚¢*/
 
