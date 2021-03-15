@@ -25,7 +25,7 @@
 /*○includeファイル*/
 /*--------------------------------------------------------*/
 #include <stdio.h>
-#include <string.h>
+
 
 
 /*--------------------------------------------------------*/
@@ -96,21 +96,6 @@ typedef struct
 }COLUM_FORM;
 
 
-/*--------------------------------------------------------*/
-/*型　名	:CLC_DATAFORM*/
-/*概　要	:処理後値の書式*/
-/*メンバ1	:出席番号*/
-/*メンバ2	:氏名*/
-/*メンバ3	:各の点数*/
-/*--------------------------------------------------------*/
-typedef struct
-{
-	unsigned char rank_num;
-	unsigned long num;
-	char name[NAME_NUM];
-	unsigned char uni_score;
-	
-}CLC_DATAFORM;
 
 /*--------------------------------------------------------*/
 /*型　名	:ANALYZE_FORM*/
@@ -122,10 +107,10 @@ typedef struct
 /*--------------------------------------------------------*/
 typedef struct
 {
-	char subject[10];	/*科目名*/
 	unsigned short max;	/*最大*/
 	unsigned short min;	/*最少*/
-	double ave;	/*平均*/
+	double ave;			/*平均*/
+	char subject[10];	/*科目名*/
 
 }ANALYZE_DATAFORTM;
 
@@ -145,24 +130,24 @@ SCORE_DATAFORM score[STUDENT_NUM] = { 0 };
 /*--------------------------------------------------------*/
 /*④関数宣言*/
 /*--------------------------------------------------------*/
+/*ファイル操作関数一覧*/
 int inputFile(COLUM_FORM*, SCORE_DATAFORM*);
 int outputFile(COLUM_FORM*, SCORE_DATAFORM*);
 void switchRow(SCORE_DATAFORM* pdata, int i);
+
+/*ソート関数一覧*/
 void sortTotal_score(SCORE_DATAFORM*);
 void sortJapanease_score(SCORE_DATAFORM*);
 void sortArithmetic_score(SCORE_DATAFORM*);
 void sortScience_score(SCORE_DATAFORM*);
 void sortSocial_score(SCORE_DATAFORM*);
+
+/*解析関数一覧*/
 void JapaneseData(ANALYZE_DATAFORTM*, SCORE_DATAFORM*);
 void ArithmeticData(ANALYZE_DATAFORTM*, SCORE_DATAFORM*);
 void ScienceData(ANALYZE_DATAFORTM*, SCORE_DATAFORM*);
 void SocialData(ANALYZE_DATAFORTM*, SCORE_DATAFORM*);
 
-
-
-void sortNum(unsigned long*, unsigned int*);
-
-//unsigned short analyzeScore(unsigned short*);
 
 /*--------------------------------------------------------*/
 /*⑤各関数*/
@@ -212,12 +197,12 @@ int inputFile(COLUM_FORM *pcolum_name, SCORE_DATAFORM* pscore)
 
 	/*列名の取得*/
 	fscanf(fp, "%[^,],%[^,],%[^,],%[^,],%[^,],%[^\n]",
-		cpy_colum_name.num,			//出席番号
-		cpy_colum_name.name,		//名前
-		cpy_colum_name.japanese,	//国語
-		cpy_colum_name.arithmetic,	//算数
-		cpy_colum_name.science,		//理科
-		cpy_colum_name.social);		//社会点数
+		cpy_colum_name.num,			/*出席番号*/
+		cpy_colum_name.name,		/*名前*/
+		cpy_colum_name.japanese,	/*国語*/
+		cpy_colum_name.arithmetic,	/*算数*/
+		cpy_colum_name.science,		/*理科*/
+		cpy_colum_name.social);		/*社会点数*/
 		
 
 	sscanf("合計","%s",cpy_colum_name.total_score);
@@ -275,7 +260,7 @@ int inputFile(COLUM_FORM *pcolum_name, SCORE_DATAFORM* pscore)
 /*概　要：入力ファイルを開きデータを格納する*/
 /*引　数：なし*/
 /*戻り値：読取成功：1　読取失敗：0*/
-/*特　記：*/
+/*特　記：各項目のソートも同時に行う*/
 /*--------------------------------------------------------*/
 int outputFile(COLUM_FORM* pcolum_name, SCORE_DATAFORM* pscore)
 {
@@ -477,7 +462,7 @@ int outputFile(COLUM_FORM* pcolum_name, SCORE_DATAFORM* pscore)
 /*概　要：Max/Min/Ave値の取得*/
 /*引　数：配列ポインタ*/
 /*戻り値：なし*/
-/*特　記：各ソート後に使用*/
+/*特　記：国語ソート後に使用*/
 /*--------------------------------------------------------*/
 void JapaneseData(ANALYZE_DATAFORTM* pdata, SCORE_DATAFORM* pscore)
 {
@@ -507,7 +492,7 @@ void JapaneseData(ANALYZE_DATAFORTM* pdata, SCORE_DATAFORM* pscore)
 /*概　要：Max/Min/Ave値の取得*/
 /*引　数：配列ポインタ*/
 /*戻り値：なし*/
-/*特　記：各ソート後に使用*/
+/*特　記：算数ソート後に使用*/
 /*--------------------------------------------------------*/
 void ArithmeticData(ANALYZE_DATAFORTM* pdata, SCORE_DATAFORM* pscore)
 {
@@ -538,7 +523,7 @@ void ArithmeticData(ANALYZE_DATAFORTM* pdata, SCORE_DATAFORM* pscore)
 /*概　要：Max/Min/Ave値の取得*/
 /*引　数：配列ポインタ*/
 /*戻り値：なし*/
-/*特　記：各ソート後に使用*/
+/*特　記：理科ソート後に使用*/
 /*--------------------------------------------------------*/
 void ScienceData(ANALYZE_DATAFORTM* pdata, SCORE_DATAFORM* pscore)
 {
@@ -568,7 +553,7 @@ void ScienceData(ANALYZE_DATAFORTM* pdata, SCORE_DATAFORM* pscore)
 /*概　要：Max/Min/Ave値の取得*/
 /*引　数：配列ポインタ*/
 /*戻り値：なし*/
-/*特　記：各ソート後に使用*/
+/*特　記：社会ソート後に使用*/
 /*--------------------------------------------------------*/
 void SocialData(ANALYZE_DATAFORTM* pdata, SCORE_DATAFORM* pscore)
 {
@@ -631,7 +616,6 @@ void sortTotal_score(SCORE_DATAFORM* pdata)
 	int i = 0;
 	int j = 0;
 	int k = 0;
-	//SCORE_DATAFORM cpy_data[STUDENT_NUM] = { 0 };
 
 	/*値のコピー*/
 	/*for (k = 0; k < STUDENT_NUM; k++)
@@ -682,7 +666,7 @@ void sortTotal_score(SCORE_DATAFORM* pdata)
 /*概　要：ソート*/
 /*引　数：配列ポインタ*/
 /*戻り値：なし*/
-/*特　記：総合点のソート*/
+/*特　記：国語のソート*/
 /*--------------------------------------------------------*/
 void sortJapanease_score(SCORE_DATAFORM* pdata)
 {
@@ -727,7 +711,7 @@ void sortJapanease_score(SCORE_DATAFORM* pdata)
 /*概　要：ソート*/
 /*引　数：配列ポインタ*/
 /*戻り値：なし*/
-/*特　記：総合点のソート*/
+/*特　記：算数のソート*/
 /*--------------------------------------------------------*/
 void sortArithmetic_score(SCORE_DATAFORM* pdata)
 {
@@ -773,7 +757,7 @@ void sortArithmetic_score(SCORE_DATAFORM* pdata)
 /*概　要：ソート*/
 /*引　数：配列ポインタ*/
 /*戻り値：なし*/
-/*特　記：総合点のソート*/
+/*特　記：理科のソート*/
 /*--------------------------------------------------------*/
 void sortScience_score(SCORE_DATAFORM* pdata)
 {
@@ -819,7 +803,7 @@ void sortScience_score(SCORE_DATAFORM* pdata)
 /*概　要：ソート*/
 /*引　数：配列ポインタ*/
 /*戻り値：なし*/
-/*特　記：総合点のソート*/
+/*特　記：社会のソート*/
 /*--------------------------------------------------------*/
 void sortSocial_score(SCORE_DATAFORM* pdata)
 {
@@ -873,54 +857,20 @@ int main(void)
 	SCORE_DATAFORM score[STUDENT_NUM] = { 0 };
 	COLUM_FORM colum_name = { 0 };
 
-	/*各科目データ*/
-	ANALYZE_DATAFORTM japanese_data = { 0 };
-	ANALYZE_DATAFORTM arithmetic_data = { 0 };
-	ANALYZE_DATAFORTM science_data = { 0 };
-	ANALYZE_DATAFORTM social_data = { 0 };
-
-
-
-	int i = 0;
-	int j = 0;
-
-
-	FILE *fp =NULL;
-
-
 	/*○概要説明*/
 	printf("<<成績表ツール：成績分析プログラム>>\n\n");
 	
 	/*①処理:ファイル入力*/
 	inputFile(&colum_name, score);/*引数：列名,スコア(アドレス情報)*/
 
-
-
 	/*②-1処理：成績順位*/
 	sortTotal_score(score);/*引数：スコア(アドレス情報)*/
 	
-
-	/*②-2処理：科目別上位者の表示*/
-	//sortJapanease_score(score);/*引数：スコア(アドレス情報)*/
-	//sortArithmetic_score(score);
-	//sortScience_score(score);
-	//sortSocial_score(score);
-
-	/*②-3処理：科目別の各項目を算出*/
-	//JapaneseData(japanese_data, score);
-	//ArithmeticData(arithmetic_data, score);
-	//ScienceData(science_data, score);
-	//SocialData(social_data, score);
-
-
 	/*③処理：ファイル出力*/
 	outputFile(&colum_name, score);/*引数：ファイル名,列名,スコア*/
 
-
 	printf("<<処理の完了>>\n\n");
 	printf("ディレクトリ内にファイル名：%sにて出力いたしました。\n",OUTPUT_FILE_NAME);
-
-
 
 	return 0;
 
