@@ -148,6 +148,10 @@ void ArithmeticData(ANALYZE_DATAFORTM*, SCORE_DATAFORM*);
 void ScienceData(ANALYZE_DATAFORTM*, SCORE_DATAFORM*);
 void SocialData(ANALYZE_DATAFORTM*, SCORE_DATAFORM*);
 
+/*小機能*/
+void getColum(FILE**, COLUM_FORM*);
+
+
 
 /*--------------------------------------------------------*/
 /*⑤各関数*/
@@ -162,7 +166,6 @@ void SocialData(ANALYZE_DATAFORTM*, SCORE_DATAFORM*);
 int inputFile(COLUM_FORM *pcolum_name, SCORE_DATAFORM* pscore)
 {
 	int i=0;
-	int stu_data[NAME_NUM] = { 0 };
 	int read_judge = 1;
 
 	char cpy_file_name[FILE_NAME_NUM] = { 0 };
@@ -171,36 +174,20 @@ int inputFile(COLUM_FORM *pcolum_name, SCORE_DATAFORM* pscore)
 
 	FILE* fp = NULL;
 
-	unsigned char list_size = sizeof(stu_data) / sizeof(stu_data[0]);
-
 	/*入力値読み取り*/
-	
 	do{
-
 		printf("Test_score.exeと同じディレクトリ内に.csvファイルを格納しください。\n");
 		printf("格納した.csvファイル名を入力し、ENTERキーを押してください。\n-->");
 		scanf_s("%s", cpy_file_name, sizeof(cpy_file_name));	/*ファイル名をキーボード入力*/
-
 		read_judge = fopen_s(&fp, cpy_file_name, "r");				/*ファイルを開く*/
 		if (read_judge == EOF)
 		{
 			printf("ERROR1:入力されたファイル名が正しくありません\n\n");
 		}
-
 	} while (read_judge == EOF);
 
 	/*列名の取得*/
-	fscanf(fp, "%[^,],%[^,],%[^,],%[^,],%[^,],%[^\n]",
-		cpy_colum_name.num,			/*出席番号*/
-		cpy_colum_name.name,		/*名前*/
-		cpy_colum_name.japanese,	/*国語*/
-		cpy_colum_name.arithmetic,	/*算数*/
-		cpy_colum_name.science,		/*理科*/
-		cpy_colum_name.social);		/*社会点数*/
-		
-
-	sscanf("合計","%s",cpy_colum_name.total_score);
-	sscanf("順位", "%s", cpy_colum_name.rank_num);
+	getColum(fp,&cpy_colum_name); /*なぜか&fpで渡せない*/
 
 	/*値の取得*/
 	for (i = 0; i < STUDENT_NUM; i++)
@@ -218,12 +205,10 @@ int inputFile(COLUM_FORM *pcolum_name, SCORE_DATAFORM* pscore)
 
 		/*値の返却*/
 		pscore[i] = cpy_score[i];
-
 	}
 
 	/*値の返却*/
 	*pcolum_name = cpy_colum_name;
-
 
 	fclose(fp); 
 
@@ -431,6 +416,35 @@ int outputFile(COLUM_FORM* pcolum_name, SCORE_DATAFORM* pscore)
 
 	return 1;
 }
+
+/*--------------------------------------------------------*/
+/*関数名：getColum*/
+/*概　要：列名の取得*/
+/*引　数：ファイルハンドル、列名配列ポインタ*/
+/*戻り値：なし*/
+/*特　記：oPenFile関数内で使用する*/
+/*--------------------------------------------------------*/
+void getColum(FILE** fp, COLUM_FORM* pcolum_name)
+{
+	COLUM_FORM cpy_colum_name = { 0 };
+	/*列名の取得*/
+	fscanf(fp, "%[^,],%[^,],%[^,],%[^,],%[^,],%[^\n]",
+		cpy_colum_name.num,			/*出席番号*/
+		cpy_colum_name.name,		/*名前*/
+		cpy_colum_name.japanese,	/*国語*/
+		cpy_colum_name.arithmetic,	/*算数*/
+		cpy_colum_name.science,		/*理科*/
+		cpy_colum_name.social);		/*社会点数*/
+
+
+	sscanf("合計", "%s", cpy_colum_name.total_score);
+	sscanf("順位", "%s", cpy_colum_name.rank_num);
+
+	*pcolum_name = cpy_colum_name;
+
+	return;
+}
+
 
 /*--------------------------------------------------------*/
 /*関数名：JapaneseData*/
