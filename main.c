@@ -181,12 +181,6 @@ int inputFile(COLUM_FORM *pcolum_name, SCORE_DATAFORM* pscore)
 		printf("格納した.csvファイル名を入力し、ENTERキーを押してください。\n-->");
 		scanf_s("%s", cpy_file_name, sizeof(cpy_file_name));	/*ファイル名をキーボード入力*/
 
-		/*デバッグコード
-		printf("要素サイズ全：%d\n", sizeof(cpy_file_name));
-		printf("要素サイズ個：%d\n", sizeof(cpy_file_name[0]));
-		printf("取得文字：%s\n", cpy_file_name);
-		*/
-
 		read_judge = fopen_s(&fp, cpy_file_name, "r");				/*ファイルを開く*/
 		if (read_judge == EOF)
 		{
@@ -208,16 +202,6 @@ int inputFile(COLUM_FORM *pcolum_name, SCORE_DATAFORM* pscore)
 	sscanf("合計","%s",cpy_colum_name.total_score);
 	sscanf("順位", "%s", cpy_colum_name.rank_num);
 
-	/*デバッグ処理
-	printf("%s ", &cpy_colum_name[0]);
-	printf("%s ", &cpy_colum_name[1]);
-	printf("%s ", &cpy_colum_name[2]);
-	printf("%s ", &cpy_colum_name[3]);
-	printf("%s ", &cpy_colum_name[4]);
-	printf("%s ", &cpy_colum_name[5]);
-	printf("%s\n", &cpy_colum_name[6]);
-	*/
-
 	/*値の取得*/
 	for (i = 0; i < STUDENT_NUM; i++)
 	{
@@ -235,15 +219,6 @@ int inputFile(COLUM_FORM *pcolum_name, SCORE_DATAFORM* pscore)
 		/*値の返却*/
 		pscore[i] = cpy_score[i];
 
-		/*デバッグ用
-		printf("出席番号:%d ", cpy_score[i].num);
-		printf("氏名:%s ", cpy_score[i].name);
-		printf("国語:%d ", cpy_score[i].japanese);
-		printf("算数:%d ", cpy_score[i].arithmetic);
-		printf("理科:%d ", cpy_score[i].science);
-		printf("社会:%d ", cpy_score[i].social);
-		printf("総合点:%d\n", cpy_score[i].total_score);
-		*/
 	}
 
 	/*値の返却*/
@@ -617,13 +592,6 @@ void sortTotal_score(SCORE_DATAFORM* pdata)
 	int j = 0;
 	int k = 0;
 
-	/*値のコピー*/
-	/*for (k = 0; k < STUDENT_NUM; k++)
-	{
-		cpy_data[k] = pdata[k];
-	}
-	*/
-
 	/*単純に総合点の比較*/
 	for (j = STUDENT_NUM; j > 0; j--)
 	{
@@ -650,13 +618,6 @@ void sortTotal_score(SCORE_DATAFORM* pdata)
 			i++;
 		}
 	}
-
-	 /*値の出力*/
-	/*for (i = 0; i < STUDENT_NUM; i++)
-	{
-		pdata[i] = cpy_data[i];
-	}
-	*/
 
 	return;
 }
