@@ -25,6 +25,7 @@
 /*○includeファイル*/
 /*--------------------------------------------------------*/
 #include <stdio.h>
+#include <string.h>
 
 
 
@@ -40,6 +41,7 @@
 #define ROW_NUM 8					/*行*/
 #define COL_NUM 10					/*列*/
 #define FILE_NAME_NUM 128			/*ファイル名数*/
+#define OUTPUT_RANK_NUM 3				/*出力ランク数*/
 #define OUTPUT_FILE_NAME "out.csv"	/*出力ファイル名*/
 
 /*--------------------------------------------------------*/
@@ -69,6 +71,25 @@ typedef struct
 	unsigned short total_score;
 
 }SCORE_DATAFORM;
+
+/*--------------------------------------------------------*/
+/*型　名	:DATAFORM*/
+/*概　要	:抽出データの書式*/
+/*メンバ1	:ランキングNo.*/
+/*メンバ2	:出席番号*/
+/*メンバ3	:氏名*/
+/*メンバ4	:各点数*/
+
+/*--------------------------------------------------------*/
+typedef struct
+{
+	unsigned char rank_num;
+	unsigned long num;
+	char name[NAME_NUM];
+	unsigned char score;
+
+
+}DATAFORM;
 
 /*--------------------------------------------------------*/
 /*型　名	:COLUM_FORM*/
@@ -150,6 +171,7 @@ void SocialData(ANALYZE_DATAFORTM*, SCORE_DATAFORM*);
 
 /*小機能*/
 void getColum(FILE**, COLUM_FORM*);
+DATAFORM copyScore(SCORE_DATAFORM*, char);
 
 
 
@@ -302,7 +324,7 @@ int outputFile(COLUM_FORM* pcolum_name, SCORE_DATAFORM* pscore)
 	JapaneseData(&japanese_data, cpy_score);
 
 	/*各値の格納*/
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < OUTPUT_RANK_NUM; i++)
 	{
 		fprintf(fp, "%d,%d,%s,%d\n",
 			cpy_score[i].rank_num,		/*ランキング順位*/
@@ -335,7 +357,7 @@ int outputFile(COLUM_FORM* pcolum_name, SCORE_DATAFORM* pscore)
 	ArithmeticData(&arithmetic_data, cpy_score);
 
 	/*各値の格納*/
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < OUTPUT_RANK_NUM; i++)
 	{
 		fprintf(fp, "%d,%d,%s,%d\n",
 			cpy_score[i].rank_num,		/*ランキング順位*/
@@ -367,7 +389,7 @@ int outputFile(COLUM_FORM* pcolum_name, SCORE_DATAFORM* pscore)
 	ScienceData(&science_data, cpy_score);
 
 	/*各値の格納*/
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < OUTPUT_RANK_NUM; i++)
 	{
 		fprintf(fp, "%d,%d,%s,%d\n",
 			cpy_score[i].rank_num,		/*ランキング順位*/
@@ -399,7 +421,7 @@ int outputFile(COLUM_FORM* pcolum_name, SCORE_DATAFORM* pscore)
 	SocialData(&social_data, cpy_score);
 
 	/*各値の格納*/
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < OUTPUT_RANK_NUM; i++)
 	{
 		fprintf(fp, "%d,%d,%s,%d\n",
 			cpy_score[i].rank_num,		/*ランキング順位*/
@@ -591,6 +613,102 @@ void switchRow(SCORE_DATAFORM* pdata,int i)
 		pdata[i] = pdata[i + 1];
 		pdata[i + 1] = cpy_data[0];
 	}
+	return;
+}
+
+/*--------------------------------------------------------*/
+/*関数名：copyScore*/
+/*概　要：ソート*/
+/*引　数：配列ポインタ,教科名*/
+/*戻り値：なし*/
+/*特　記：各値のコピー*/
+/*--------------------------------------------------------*/
+DATAFORM copyScore(SCORE_DATAFORM* pdata,char colum)
+{
+	int i = 0;
+	int j = 0;
+	int k = 0;
+	DATAFORM cpy_score[STUDENT_NUM] = { 0 };
+	int colum_num = 0;
+
+	if (colum == "japanese")
+	{
+		colum_num = 1;
+	}
+	else if (colum == "arithmetic")
+	{
+		colum_num = 2;
+	}
+	else if (colum == "science")
+	{
+		colum_num = 3;
+	}
+	else if (colum == "social")
+	{
+		colum_num = 4;
+	}
+	else if (colum == "total_score")
+	{
+		colum_num = 5;
+	}
+
+	/*値のコピー*/
+	for (i = 0; i < STUDENT_NUM; i++)
+	{
+		cpy_score[i].num = pdata[i].num;
+		strcpy_s(cpy_score[i].name,sizeof(cpy_score[i].name),pdata[i].name);
+		switch (colum_num)
+		{
+		case 1:
+			cpy_score[i].score = pdata[i].japanese;
+			break;
+
+		case 2:
+			cpy_score[i].score = pdata[i].arithmetic;
+			break;
+
+		case 3:
+			cpy_score[i].score = pdata[i].science;
+			break;
+
+		case 4:
+			cpy_score[i].score = pdata[i].social;
+			break;
+
+		case 5:
+			cpy_score[i].score = pdata[i].total_score;
+			break;
+		}
+
+	}
+
+	/*単純に総合点の比較*/
+	for (j = STUDENT_NUM; j > 0; j--)
+	{
+		for (i = 0; i < j; i++)
+		{
+			if (cpy_score[i].score < cpy_score[i+1].score)
+			{
+				switchRow(cpy_score, i);
+			}
+		}
+	}
+
+	/*順位の調整*/
+	for (k = 0; k < STUDENT_NUM; k++)
+	{
+		if (cpy_score[k].score > cpy_score[k+1].score)
+		{
+			cpy_score[k].rank_num = k + 1;
+		}
+		else if (cpy_score[k].score == cpy_score[k].score)
+		{
+			cpy_score[k].rank_num = k + 1;
+			cpy_score[k + 1].rank_num = k + 1;
+			k++;
+		}
+	}
+
 	return;
 }
 
@@ -832,6 +950,7 @@ int main(void)
 	/*基本データ*/
 	SCORE_DATAFORM score[STUDENT_NUM] = { 0 };
 	COLUM_FORM colum_name = { 0 };
+	DATAFORM japanese_score[STUDENT_NUM] = { 0 };
 
 	/*○概要説明*/
 	printf("<<成績表ツール：成績分析プログラム>>\n\n");
@@ -839,6 +958,7 @@ int main(void)
 	/*①処理:ファイル入力*/
 	inputFile(&colum_name, score);/*引数：列名,スコア(アドレス情報)*/
 
+	japanese_score = copyScore(SCORE_DATAFORM * pdata, char colum)
 	/*②-1処理：成績順位*/
 	sortTotal_score(score);/*引数：スコア(アドレス情報)*/
 	
@@ -849,5 +969,6 @@ int main(void)
 	printf("ディレクトリ内にファイル名：%sにて出力いたしました。\n",OUTPUT_FILE_NAME);
 
 	return 0;
+
 
 }
