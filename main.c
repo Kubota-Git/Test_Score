@@ -88,7 +88,6 @@ typedef struct
 	char name[NAME_NUM];
 	unsigned char score;
 
-
 }DATAFORM;
 
 /*--------------------------------------------------------*/
@@ -131,7 +130,7 @@ typedef struct
 	unsigned short max;	/*最大*/
 	unsigned short min;	/*最少*/
 	double ave;			/*平均*/
-	char subject[10];	/*科目名*/
+	char subject[32];	/*科目名*/
 
 }ANALYZE_DATAFORTM;
 
@@ -146,6 +145,7 @@ typedef struct
 /*--------------------------------------------------------*/
 
 SCORE_DATAFORM score[STUDENT_NUM] = { 0 };
+
 
 
 /*--------------------------------------------------------*/
@@ -171,7 +171,9 @@ void SocialData(ANALYZE_DATAFORTM*, SCORE_DATAFORM*);
 
 /*小機能*/
 void getColum(FILE**, COLUM_FORM*);
-DATAFORM copyScore(SCORE_DATAFORM*, char);
+void sortScore(SCORE_DATAFORM*, char*, DATAFORM*, ANALYZE_DATAFORTM*);
+void analyzeScore(DATAFORM*, ANALYZE_DATAFORTM*);
+int outputScore(DATAFORM*, ANALYZE_DATAFORTM*);
 
 
 
@@ -239,7 +241,7 @@ int inputFile(COLUM_FORM *pcolum_name, SCORE_DATAFORM* pscore)
 }
 
 /*--------------------------------------------------------*/
-/*関数名：closeFile*/
+/*関数名：outputFile*/
 /*概　要：入力ファイルを開きデータを格納する*/
 /*引　数：なし*/
 /*戻り値：読取成功：1　読取失敗：0*/
@@ -251,10 +253,10 @@ int outputFile(COLUM_FORM* pcolum_name, SCORE_DATAFORM* pscore)
 	COLUM_FORM cpy_colum_name = { 0 };
 	SCORE_DATAFORM cpy_score[STUDENT_NUM] = { 0 };
 	/*各科目データ*/
-	ANALYZE_DATAFORTM japanese_data = { 0 };
-	ANALYZE_DATAFORTM arithmetic_data = { 0 };
-	ANALYZE_DATAFORTM science_data = { 0 };
-	ANALYZE_DATAFORTM social_data = { 0 };
+	ANALYZE_DATAFORTM japanese_parameter = { 0 };
+	ANALYZE_DATAFORTM arithmetic_parameter = { 0 };
+	ANALYZE_DATAFORTM science_parameter = { 0 };
+	ANALYZE_DATAFORTM social_parameter = { 0 };
 
 	/*値のコピー*/
 	for (i = 0; i < STUDENT_NUM; i++)
@@ -321,7 +323,7 @@ int outputFile(COLUM_FORM* pcolum_name, SCORE_DATAFORM* pscore)
 	sortJapanease_score(cpy_score);/*引数：スコア(アドレス情報)*/
 
 	/*②-3処理：科目別の各項目を算出*/
-	JapaneseData(&japanese_data, cpy_score);
+	JapaneseData(&japanese_parameter, cpy_score);
 
 	/*各値の格納*/
 	for (i = 0; i < OUTPUT_RANK_NUM; i++)
@@ -335,9 +337,9 @@ int outputFile(COLUM_FORM* pcolum_name, SCORE_DATAFORM* pscore)
 
 	/*最大最少値のセット*/
 	fprintf(fp, "%s,%d\n%s,%d\n%s,%.1f\n", /*小数点第1桁表示*/
-		"最高", japanese_data.max,
-		"最低", japanese_data.min,
-		"平均", japanese_data.ave);
+		"最高", japanese_parameter.max,
+		"最低", japanese_parameter.min,
+		"平均", japanese_parameter.ave);
 
 
 	/*題目のセット*/
@@ -354,7 +356,7 @@ int outputFile(COLUM_FORM* pcolum_name, SCORE_DATAFORM* pscore)
 	sortArithmetic_score(cpy_score);/*引数：スコア(アドレス情報)*/
 
 	/*②-3処理：科目別の各項目を算出*/
-	ArithmeticData(&arithmetic_data, cpy_score);
+	ArithmeticData(&arithmetic_parameter, cpy_score);
 
 	/*各値の格納*/
 	for (i = 0; i < OUTPUT_RANK_NUM; i++)
@@ -367,9 +369,9 @@ int outputFile(COLUM_FORM* pcolum_name, SCORE_DATAFORM* pscore)
 	}
 	/*最大最少値のセット*/
 	fprintf(fp, "%s,%d\n%s,%d\n%s,%.1f\n", /*小数点第1桁表示*/
-		"最高", arithmetic_data.max,
-		"最低", arithmetic_data.min,
-		"平均", arithmetic_data.ave);
+		"最高", arithmetic_parameter.max,
+		"最低", arithmetic_parameter.min,
+		"平均", arithmetic_parameter.ave);
 
 
 	/*題目のセット*/
@@ -386,7 +388,7 @@ int outputFile(COLUM_FORM* pcolum_name, SCORE_DATAFORM* pscore)
 	sortScience_score(cpy_score);/*引数：スコア(アドレス情報)*/
 
 	/*②-3処理：科目別の各項目を算出*/
-	ScienceData(&science_data, cpy_score);
+	ScienceData(&science_parameter, cpy_score);
 
 	/*各値の格納*/
 	for (i = 0; i < OUTPUT_RANK_NUM; i++)
@@ -399,9 +401,9 @@ int outputFile(COLUM_FORM* pcolum_name, SCORE_DATAFORM* pscore)
 	}
 	/*最大最少値のセット*/
 	fprintf(fp, "%s,%d\n%s,%d\n%s,%.1f\n", /*小数点第1桁表示*/
-		"最高", science_data.max,
-		"最低", science_data.min,
-		"平均", science_data.ave);
+		"最高", science_parameter.max,
+		"最低", science_parameter.min,
+		"平均", science_parameter.ave);
 
 
 	/*題目のセット*/
@@ -418,7 +420,7 @@ int outputFile(COLUM_FORM* pcolum_name, SCORE_DATAFORM* pscore)
 	sortSocial_score(cpy_score);/*引数：スコア(アドレス情報)*/
 
 	/*②-3処理：科目別の各項目を算出*/
-	SocialData(&social_data, cpy_score);
+	SocialData(&social_parameter, cpy_score);
 
 	/*各値の格納*/
 	for (i = 0; i < OUTPUT_RANK_NUM; i++)
@@ -431,9 +433,53 @@ int outputFile(COLUM_FORM* pcolum_name, SCORE_DATAFORM* pscore)
 	}
 	/*最大最少値のセット*/
 	fprintf(fp, "%s,%d\n%s,%d\n%s,%.1f\n", /*小数点第1桁表示*/
-		"最高", social_data.max,
-		"最低", social_data.min,
-		"平均", social_data.ave);
+		"最高", social_parameter.max,
+		"最低", social_parameter.min,
+		"平均", social_parameter.ave);
+
+	fclose(fp);
+
+	return 1;
+}
+
+/*--------------------------------------------------------*/
+/*関数名：closeFile2*/
+/*概　要：入力ファイルを開きデータを格納する*/
+/*引　数：なし*/
+/*戻り値：読取成功：1　読取失敗：0*/
+/*特　記：各項目のソートも同時に行う*/
+/*--------------------------------------------------------*/
+int outputScore(DATAFORM* pscore, ANALYZE_DATAFORTM* pparameter)
+{
+	int i = 0;
+	ANALYZE_DATAFORTM cpy_parameter = { 0 };
+
+
+	/*値のコピー*/
+	cpy_parameter= *pparameter;
+
+
+	FILE* fp = NULL;
+
+	fopen_s(&fp, OUTPUT_FILE_NAME, "a");
+
+	/*題目のセット*/
+	fprintf(fp, "\n%s\n", "■科目別成績(%s)",pparameter->subject);/*項目5*/
+
+	/*各値の格納*/
+	for (i = 0; i < OUTPUT_RANK_NUM; i++)
+	{
+		fprintf(fp, "%d,%d,%s,%d\n",
+			pscore[i].rank_num,		/*ランキング順位*/
+			pscore[i].num,			/*出席番号*/
+			pscore[i].name,			/*名前*/
+			pscore[i].score);		/*社会*/
+	}
+	/*最大最少値のセット*/
+	fprintf(fp, "%s,%d\n%s,%d\n%s,%.1f\n", /*小数点第1桁表示*/
+		"最高", pparameter->max,
+		"最低", pparameter->min,
+		"平均", pparameter->ave);
 
 	fclose(fp);
 
@@ -591,6 +637,39 @@ void SocialData(ANALYZE_DATAFORTM* pdata, SCORE_DATAFORM* pscore)
 	return;
 }
 
+
+/*--------------------------------------------------------*/
+/*関数名：analyzeScore*/
+/*概　要：Max/Min/Ave値の取得*/
+/*引　数：スコアポインタ,解析値ポインタ*/
+/*戻り値：なし*/
+/*特　記：ソート後に使用*/
+/*--------------------------------------------------------*/
+void analyzeScore(DATAFORM* pscore, ANALYZE_DATAFORTM* pdata)
+{
+	int i = 0;
+	int j = 0;
+	int k = 0;
+
+
+	double ave_score = 0;
+	ANALYZE_DATAFORTM score_data = { 0 };
+
+	/*Max/Minの取得*/
+	pdata->max = pscore[0].score;
+	pdata->min = pscore[STUDENT_NUM - 1].score;
+
+	/*Aveの取得*/
+	for (i = 0; i < STUDENT_NUM; i++)
+	{
+		ave_score += pscore[i].score;
+	}
+	pdata->ave = ave_score / STUDENT_NUM;
+
+	return;
+}
+
+
 /*--------------------------------------------------------*/
 /*関数名：switchRow*/
 /*概　要：前後行の入替のみ*/
@@ -617,37 +696,39 @@ void switchRow(SCORE_DATAFORM* pdata,int i)
 }
 
 /*--------------------------------------------------------*/
-/*関数名：copyScore*/
+/*関数名：sortScore*/
 /*概　要：ソート*/
-/*引　数：配列ポインタ,教科名*/
+/*引　数：スコアポインタ,教科名,解析値ポインタ*/
 /*戻り値：なし*/
-/*特　記：各値のコピー*/
+/*特　記：ソート後に最大値最小値も取得*/
 /*--------------------------------------------------------*/
-DATAFORM copyScore(SCORE_DATAFORM* pdata,char colum)
+void sortScore(SCORE_DATAFORM* pdata,char* colum_name, DATAFORM* pscore, ANALYZE_DATAFORTM* pparameter)
 {
 	int i = 0;
 	int j = 0;
 	int k = 0;
 	DATAFORM cpy_score[STUDENT_NUM] = { 0 };
+	DATAFORM switch_score[1] = { 0 };
+	ANALYZE_DATAFORTM copy_parameter = {0};
 	int colum_num = 0;
 
-	if (colum == "japanese")
+	if (colum_name == "国語")
 	{
 		colum_num = 1;
 	}
-	else if (colum == "arithmetic")
+	else if (colum_name == "算数")
 	{
 		colum_num = 2;
 	}
-	else if (colum == "science")
+	else if (colum_name == "理科")
 	{
 		colum_num = 3;
 	}
-	else if (colum == "social")
+	else if (colum_name == "社会")
 	{
 		colum_num = 4;
 	}
-	else if (colum == "total_score")
+	else if (colum_name == "合計")
 	{
 		colum_num = 5;
 	}
@@ -662,25 +743,21 @@ DATAFORM copyScore(SCORE_DATAFORM* pdata,char colum)
 		case 1:
 			cpy_score[i].score = pdata[i].japanese;
 			break;
-
 		case 2:
 			cpy_score[i].score = pdata[i].arithmetic;
 			break;
-
 		case 3:
 			cpy_score[i].score = pdata[i].science;
 			break;
-
 		case 4:
 			cpy_score[i].score = pdata[i].social;
 			break;
-
 		case 5:
 			cpy_score[i].score = pdata[i].total_score;
 			break;
 		}
-
 	}
+
 
 	/*単純に総合点の比較*/
 	for (j = STUDENT_NUM; j > 0; j--)
@@ -689,7 +766,10 @@ DATAFORM copyScore(SCORE_DATAFORM* pdata,char colum)
 		{
 			if (cpy_score[i].score < cpy_score[i+1].score)
 			{
-				switchRow(cpy_score, i);
+				/*配列番号iの前後データを入れ替え*/
+				switch_score[0] = cpy_score[i];
+				cpy_score[i] = cpy_score[i + 1];
+				cpy_score[i + 1] = switch_score[0];
 			}
 		}
 	}
@@ -709,8 +789,21 @@ DATAFORM copyScore(SCORE_DATAFORM* pdata,char colum)
 		}
 	}
 
-	return;
+	/*最大最少値の解析*/
+	copy_parameter = *pparameter;
+	strcpy_s(copy_parameter.subject, sizeof(copy_parameter.subject), colum_name);
+	analyzeScore(&cpy_score, &copy_parameter);
+	*pparameter = copy_parameter;
+
+	/*値の返却*/
+	for (i = 0; i < STUDENT_NUM; i++)
+	{
+		pscore[i] = cpy_score[i];
+	}
+
+	return 0;
 }
+
 
 /*--------------------------------------------------------*/
 /*関数名：sortTotal_score*/
@@ -751,7 +844,6 @@ void sortTotal_score(SCORE_DATAFORM* pdata)
 			i++;
 		}
 	}
-
 	return;
 }
 
@@ -951,6 +1043,15 @@ int main(void)
 	SCORE_DATAFORM score[STUDENT_NUM] = { 0 };
 	COLUM_FORM colum_name = { 0 };
 	DATAFORM japanese_score[STUDENT_NUM] = { 0 };
+	DATAFORM arithmetic_score;
+	DATAFORM science_score;
+	DATAFORM social_score;
+
+	ANALYZE_DATAFORTM japanese_parameter = { 0 };
+	ANALYZE_DATAFORTM arithmetic_parameter = { 0 };
+	ANALYZE_DATAFORTM science_parameter = { 0 };
+	ANALYZE_DATAFORTM social_parameter = { 0 };
+
 
 	/*○概要説明*/
 	printf("<<成績表ツール：成績分析プログラム>>\n\n");
@@ -958,17 +1059,28 @@ int main(void)
 	/*①処理:ファイル入力*/
 	inputFile(&colum_name, score);/*引数：列名,スコア(アドレス情報)*/
 
-	japanese_score = copyScore(SCORE_DATAFORM * pdata, char colum)
 	/*②-1処理：成績順位*/
 	sortTotal_score(score);/*引数：スコア(アドレス情報)*/
+
+
+	/*②-2処理：科目別順位*/
+	sortScore(&score, "国語", &japanese_score, &japanese_parameter);
+	sortScore(&score, "算数", &arithmetic_score,&arithmetic_parameter);
+	sortScore(&score, "理科", &science_score,&science_parameter);
+	sortScore(&score, "社会", &social_score,&social_parameter);
+
+
 	
 	/*③処理：ファイル出力*/
 	outputFile(&colum_name, score);/*引数：ファイル名,列名,スコア*/
+	outputScore(&japanese_score, &japanese_parameter);
+	outputScore(&arithmetic_score, &arithmetic_parameter);
+	outputScore(&science_score, &science_parameter);
+	outputScore(&social_score, &social_parameter);
 
 	printf("<<処理の完了>>\n\n");
 	printf("ディレクトリ内にファイル名：%sにて出力いたしました。\n",OUTPUT_FILE_NAME);
 
 	return 0;
-
 
 }
