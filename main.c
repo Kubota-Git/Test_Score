@@ -308,135 +308,6 @@ int outputFile(COLUM_FORM* pcolum_name, SCORE_DATAFORM* pscore)
 			cpy_score[i].total_score);	/*社会点数*/
 	}
 
-	/*題目のセット*/
-	fprintf(fp, "\n%s\n", "■科目別成績(国語)");/*項目2*/
-
-	/*項目名のセット*/
-	fprintf(fp, "%s,%s,%s,%s\n",
-		cpy_colum_name.rank_num,		/*ランキング順位*/
-		cpy_colum_name.num,				/*出席番号*/
-		cpy_colum_name.name,			/*名前*/
-		"得点");						/*国語*/
-
-
-	/*②-2処理：科目別上位者の表示*/
-	sortJapanease_score(cpy_score);/*引数：スコア(アドレス情報)*/
-
-	/*②-3処理：科目別の各項目を算出*/
-	JapaneseData(&japanese_parameter, cpy_score);
-
-	/*各値の格納*/
-	for (i = 0; i < OUTPUT_RANK_NUM; i++)
-	{
-		fprintf(fp, "%d,%d,%s,%d\n",
-			cpy_score[i].rank_num,		/*ランキング順位*/
-			cpy_score[i].num,			/*出席番号*/
-			cpy_score[i].name,			/*名前*/
-			cpy_score[i].japanese);		/*国語*/
-	}
-
-	/*最大最少値のセット*/
-	fprintf(fp, "%s,%d\n%s,%d\n%s,%.1f\n", /*小数点第1桁表示*/
-		"最高", japanese_parameter.max,
-		"最低", japanese_parameter.min,
-		"平均", japanese_parameter.ave);
-
-
-	/*題目のセット*/
-	fprintf(fp, "\n%s\n", "■科目別成績(算数)");/*項目3*/
-
-	/*項目名のセット*/
-	fprintf(fp, "%s,%s,%s,%s\n",
-		cpy_colum_name.rank_num,		/*ランキング順位*/
-		cpy_colum_name.num,				/*出席番号*/
-		cpy_colum_name.name,			/*名前*/
-		"得点");						/*算数*/
-
-		/*②-2処理：科目別上位者の表示*/
-	sortArithmetic_score(cpy_score);/*引数：スコア(アドレス情報)*/
-
-	/*②-3処理：科目別の各項目を算出*/
-	ArithmeticData(&arithmetic_parameter, cpy_score);
-
-	/*各値の格納*/
-	for (i = 0; i < OUTPUT_RANK_NUM; i++)
-	{
-		fprintf(fp, "%d,%d,%s,%d\n",
-			cpy_score[i].rank_num,		/*ランキング順位*/
-			cpy_score[i].num,			/*出席番号*/
-			cpy_score[i].name,			/*名前*/
-			cpy_score[i].arithmetic);	/*算数*/
-	}
-	/*最大最少値のセット*/
-	fprintf(fp, "%s,%d\n%s,%d\n%s,%.1f\n", /*小数点第1桁表示*/
-		"最高", arithmetic_parameter.max,
-		"最低", arithmetic_parameter.min,
-		"平均", arithmetic_parameter.ave);
-
-
-	/*題目のセット*/
-	fprintf(fp, "\n%s\n", "■科目別成績(理科)");/*項目4*/
-
-	/*項目名のセット*/
-	fprintf(fp, "%s,%s,%s,%s\n",
-		cpy_colum_name.rank_num,		/*ランキング順位*/
-		cpy_colum_name.num,				/*出席番号*/
-		cpy_colum_name.name,			/*名前*/
-		"得点");						/*理科*/
-
-			/*②-2処理：科目別上位者の表示*/
-	sortScience_score(cpy_score);/*引数：スコア(アドレス情報)*/
-
-	/*②-3処理：科目別の各項目を算出*/
-	ScienceData(&science_parameter, cpy_score);
-
-	/*各値の格納*/
-	for (i = 0; i < OUTPUT_RANK_NUM; i++)
-	{
-		fprintf(fp, "%d,%d,%s,%d\n",
-			cpy_score[i].rank_num,		/*ランキング順位*/
-			cpy_score[i].num,			/*出席番号*/
-			cpy_score[i].name,			/*名前*/
-			cpy_score[i].science);		/*理科*/
-	}
-	/*最大最少値のセット*/
-	fprintf(fp, "%s,%d\n%s,%d\n%s,%.1f\n", /*小数点第1桁表示*/
-		"最高", science_parameter.max,
-		"最低", science_parameter.min,
-		"平均", science_parameter.ave);
-
-
-	/*題目のセット*/
-	fprintf(fp, "\n%s\n", "■科目別成績(社会)");/*項目5*/
-
-	/*項目名のセット*/
-	fprintf(fp, "%s,%s,%s,%s\n",
-		cpy_colum_name.rank_num,		/*ランキング順位*/
-		cpy_colum_name.num,				/*出席番号*/
-		cpy_colum_name.name,			/*名前*/
-		"得点");						/*社会*/
-
-				/*②-2処理：科目別上位者の表示*/
-	sortSocial_score(cpy_score);/*引数：スコア(アドレス情報)*/
-
-	/*②-3処理：科目別の各項目を算出*/
-	SocialData(&social_parameter, cpy_score);
-
-	/*各値の格納*/
-	for (i = 0; i < OUTPUT_RANK_NUM; i++)
-	{
-		fprintf(fp, "%d,%d,%s,%d\n",
-			cpy_score[i].rank_num,		/*ランキング順位*/
-			cpy_score[i].num,			/*出席番号*/
-			cpy_score[i].name,			/*名前*/
-			cpy_score[i].social);		/*社会*/
-	}
-	/*最大最少値のセット*/
-	fprintf(fp, "%s,%d\n%s,%d\n%s,%.1f\n", /*小数点第1桁表示*/
-		"最高", social_parameter.max,
-		"最低", social_parameter.min,
-		"平均", social_parameter.ave);
-
 	fclose(fp);
 
 	return 1;
@@ -452,11 +323,7 @@ int outputFile(COLUM_FORM* pcolum_name, SCORE_DATAFORM* pscore)
 int outputScore(DATAFORM* pscore, ANALYZE_DATAFORTM* pparameter)
 {
 	int i = 0;
-	ANALYZE_DATAFORTM cpy_parameter = { 0 };
-
-
-	/*値のコピー*/
-	cpy_parameter= *pparameter;
+	char title[128] = { "■科目別成績(" };
 
 
 	FILE* fp = NULL;
@@ -464,7 +331,10 @@ int outputScore(DATAFORM* pscore, ANALYZE_DATAFORTM* pparameter)
 	fopen_s(&fp, OUTPUT_FILE_NAME, "a");
 
 	/*題目のセット*/
-	fprintf(fp, "\n%s\n", "■科目別成績(%s)",pparameter->subject);/*項目5*/
+	strcat_s(title,sizeof(title),pparameter->subject);
+	printf("デバッグ確認：%s", title);
+	printf("デバッグ確認：%s", pparameter->subject);
+	fprintf(fp, "\n%s)\n", title);
 
 	/*各値の格納*/
 	for (i = 0; i < OUTPUT_RANK_NUM; i++)
@@ -473,7 +343,7 @@ int outputScore(DATAFORM* pscore, ANALYZE_DATAFORTM* pparameter)
 			pscore[i].rank_num,		/*ランキング順位*/
 			pscore[i].num,			/*出席番号*/
 			pscore[i].name,			/*名前*/
-			pscore[i].score);		/*社会*/
+			pscore[i].score);		/*値*/
 	}
 	/*最大最少値のセット*/
 	fprintf(fp, "%s,%d\n%s,%d\n%s,%.1f\n", /*小数点第1桁表示*/
